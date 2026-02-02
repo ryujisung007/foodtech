@@ -2,44 +2,44 @@ import streamlit as st
 import engine_ai
 
 def render_results(filtered_df):
-    """데이터 테이블과 AI 시뮬레이션을 안정적으로 출력"""
+    """테이블 출력 -> AI 상세 분석(이미지3개 포함) -> 챗봇 순으로 렌더링"""
     if filtered_df.empty:
-        st.warning("데이터가 없습니다.")
+        st.warning("조건에 맞는 데이터가 없습니다.")
         return
 
-    # 상단 데이터 테이블
-    st.markdown("### 📋 기업 데이터 리스트")
+    # 1. 상단 데이터 테이블 출력
+    st.markdown("### 📋 선택된 기업 상세 데이터")
     st.dataframe(filtered_df, use_container_width=True)
     st.divider()
 
+    # 2. 기업별 상세 분석 (좌측 텍스트, 우측 이미지 3개)
     for _, row in filtered_df.iterrows():
-        # 원본 CSV의 정확한 헤더인 '기업이름' 사용
         name = row['기업이름']
         tech = str(row.get('대표기술', '정보없음'))
         prod = str(row.get('대표제품', '정보없음'))
 
-        st.header(f"🔬 {name} R&D 시뮬레이션")
-        col_left, col_right = st.columns([4, 6])
+        st.header(f"🚀 {name} R&D 시뮬레이션")
+        col_text, col_img = st.columns([4, 6])
         
-        with col_left:
+        with col_text:
             st.subheader("💡 신제품 개발 제안")
-            with st.spinner("전문 AI가 분석 중..."):
+            with st.spinner(f"{name} 분석 중..."):
                 analysis = engine_ai.get_product_ideation(name, tech, prod)
                 st.markdown(analysis)
         
-        with col_right:
+        with col_img:
             st.subheader("🎨 추천 시안 (3개)")
-            with st.spinner("나노 바나나가 생성 중..."):
+            with st.spinner("이미지 생성 중..."):
                 imgs = engine_ai.generate_nano_banana_images(tech, prod)
                 if imgs:
-                    for i, img in enumerate(imgs):
-                        st.image(img, caption=f"시안 {i+1}", use_container_width=True)
+                    for idx, img in enumerate(imgs):
+                        st.image(img, caption=f"Concept Art {idx+1}", use_container_width=True)
                 else:
-                    st.info("이미지 생성 기능을 불러오지 못했습니다. API 설정을 확인해 주세요.")
+                    st.info("🎨 이미지 생성 엔진을 로드하고 있습니다.")
         st.divider()
 
-    # 결과 하단에 챗봇 인터페이스가 항상 나타나도록 배치 (복구됨)
-    st.markdown("### 💬 R&D 어시스턴트 챗봇")
+    # 3. 하단 챗봇 복구
+    st.markdown("### 💬 R&D 전문가 상담 챗봇")
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -47,13 +47,12 @@ def render_results(filtered_df):
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    if prompt := st.chat_input("신제품 개발에 대해 더 궁금한 점을 물어보세요!"):
+    if prompt := st.chat_input("신제품 개발에 대해 더 질문해 보세요!"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
-        st.session_state.messages.append({"role": "user", "content": prompt})
         
-        # 챗봇 응답 로직 (Gemini 활용)
         with st.chat_message("assistant"):
-            response = engine_ai.get_product_ideation("챗봇상담", "상담", prompt)
+            response = engine_ai.get_product_ideation("전문상담", "질의응답", prompt)
             st.markdown(response)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+            st.session_state.messages.append({"role": "assistant", "content": response})
