@@ -25,25 +25,25 @@ def render_results(filtered_df):
     if not filtered_df.empty:
         st.subheader(f"📊 기업 정보 조회 (총 {len(filtered_df)}건)")
         
-        # 테이블은 기본 정보만 간결하게 표시
+        # 테이블은 기본 정보만 표시
         display_cols = ['기업이름', '중분류', '소분류']
         st.dataframe(filtered_df[display_cols], use_container_width=True, hide_index=True)
         
         st.divider()
         
-        # [핵심 수정] 기업 선택 시 기술과 제품 정보를 동시에 확인
+        # 기업 기술/소재 분석 섹션
         st.subheader("💡 기업 기술/소재 분석 및 AI 제품 제안")
         company_list = filtered_df['기업이름'].tolist()
         target_company = st.selectbox("분석할 기업을 선택하세요", company_list)
         
-        # 선택된 기업 데이터 안전 추출
+        # 데이터 안전 추출 (TypeError 방지)
         selected_data = filtered_df[filtered_df['기업이름'] == target_company].iloc[0]
         tech_val = selected_data['대표기술']
         prod_val = selected_data['대표제품']
-        site_val = str(selected_data['사이트 주소']).strip()
+        # 사이트 주소 가져오기
+        site_val = str(selected_data.get('사이트 주소', '-')).strip()
 
         with st.container(border=True):
-            # [요청 반영] 대표기술과 대표제품 모두 출력
             st.markdown(f"### 🏢 {target_company}")
             c1, c2 = st.columns(2)
             with c1:
@@ -51,11 +51,13 @@ def render_results(filtered_df):
             with c2:
                 st.success(f"**📦 대표제품(소재)**\n\n{prod_val}")
             
+            # [추가] 사이트 주소 연결 버튼 (다른 기능은 유지)
             if site_val and site_val != '-':
+                # URL이 여러 개일 경우 첫 번째 줄의 URL만 추출
                 clean_url = site_val.split('\n')[0].strip()
-                st.link_button("🌐 기업 공식 홈페이지 방문", clean_url)
+                st.link_button("🌐 기업 공식 홈페이지 방문", clean_url, use_container_width=True)
 
-        # AI 아이디에이션 실행
+        # AI 아이디에이션 실행 버튼 (기존 기능 유지)
         if st.button(f"🚀 {target_company} 기술 및 소재 기반 신제품 제안"):
             with st.spinner("AI가 기술과 소재를 융합하여 제품을 설계 중입니다..."):
                 ideas = engine_ai.get_product_ideation(target_company, tech_val, prod_val)
