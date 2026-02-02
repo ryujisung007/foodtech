@@ -1,35 +1,34 @@
 import streamlit as st
 import engine_ai
 
-def render_results(filtered_df, full_df):
-    """결과 화면: 좌측 설명 / 우측 이미지 3개 리스트"""
+def render_results(filtered_df):
+    """좌측 설명, 우측 3개 이미지 레이아웃 렌더링"""
     if filtered_df.empty:
-        st.warning("데이터가 존재하지 않습니다.")
+        st.warning("데이터가 없습니다.")
         return
 
     for _, row in filtered_df.iterrows():
-        st.header(f"📊 {row['회사명']} R&D 시뮬레이션")
+        # 원본 DB 헤더 '기업이름' 사용
+        name = row['기업이름']
+        tech = row.get('대표기술', '일반 기술')
+        prod = row.get('대표제품', '일반 제품')
+
+        st.subheader(f"🏢 {name} R&D 분석 결과")
+        col_text, col_img = st.columns([4, 6])
         
-        col_left, col_right = st.columns([4, 6])
-        
-        with col_left:
-            st.subheader("💡 신제품 개발 제안")
+        with col_text:
+            st.info("💡 신제품 제안")
             with st.spinner("AI 분석 중..."):
-                analysis = engine_ai.get_product_ideation(
-                    row['회사명'], row['대표기술'], row['대표제품']
-                )
-                st.markdown(analysis)
+                ideation = engine_ai.get_product_ideation(name, tech, prod)
+                st.markdown(ideation)
         
-        with col_right:
-            st.subheader("🎨 추천 디자인 시안 (3개)")
-            with st.spinner("나노 바나나가 그림을 그리는 중..."):
-                images = engine_ai.generate_nano_banana_images(
-                    row['대표기술'], row['대표제품']
-                )
-                
-                if images:
-                    for idx, img in enumerate(images):
-                        st.image(img, caption=f"시안 {idx+1}", use_container_width=True)
+        with col_img:
+            st.success("🎨 추천 이미지 시안 (3개)")
+            with st.spinner("나노 바나나가 생성 중..."):
+                imgs = engine_ai.generate_nano_banana_images(tech, prod)
+                if imgs:
+                    for i, img in enumerate(imgs):
+                        st.image(img, caption=f"시안 {i+1}", use_container_width=True)
                 else:
-                    st.info("이미지 생성 기능을 준비 중이거나 API 할당량이 초과되었습니다.")
+                    st.info("이미지 생성 API를 확인해주세요.")
         st.divider()
