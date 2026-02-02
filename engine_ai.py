@@ -2,22 +2,21 @@ import google.generativeai as genai
 import streamlit as st
 
 def init_gemini():
-    """가용한 최신 Gemini 모델을 자동으로 탐색하여 연결"""
+    """사용 가능한 최신 Gemini 모델을 자동으로 찾아 연결"""
     try:
-        api_key = st.secrets["GEMINI_API_KEY"]
-        genai.configure(api_key=api_key)
+        if "GEMINI_API_KEY" not in st.secrets:
+            st.error("Secrets에 'GEMINI_API_KEY'가 없습니다.")
+            return None
         
-        # 가용 모델 리스트 필터링
+        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
         available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
         
-        # 우선순위: 1.5-flash -> 1.5-pro -> gemini-pro
         target_models = ['models/gemini-1.5-flash', 'models/gemini-1.5-pro', 'models/gemini-pro']
         selected = next((m for m in target_models if m in available_models), 
                         available_models[0] if available_models else None)
         
         return genai.GenerativeModel(selected) if selected else None
     except Exception as e:
-        st.error(f"Gemini 초기화 오류: {e}")
         return None
 
 def get_product_ideation(company_name, tech_info, product_info):
@@ -26,11 +25,11 @@ def get_product_ideation(company_name, tech_info, product_info):
     if not model: return "AI 모델을 불러올 수 없습니다."
 
     prompt = f"""
-    당신은 식품공학 박사 및 식품기술사입니다.
+    당신은 식품공학 박사이자 식품기술사입니다.
     [{company_name}]의 기술({tech_info})과 소재({product_info})를 분석하여 
-    아이스크림, 초콜릿, 초콜릿 코팅, 베이커리 4개 분야의 신제품을 제안하세요.
-    - 특히 '식물성 계란(ALOK)'과 같은 메타텍스쳐 기술의 겔화(Gelation) 및 응고 특징을 기술하십시오.
-    - 기술은 적용방안 중심으로, 소재는 신소재 융합 기술 중심으로 설명하세요.
+    아이스크림, 초콜릿, 초콜릿 코팅, 베이커리 4개 분야의 혁신 제품을 제안하세요.
+    - 특히 '메타텍스쳐(ALOK 등)' 기술의 겔화 및 응고 특징을 기술하십시오.
+    - 전문 용어를 사용하여 상세히 설명하세요.
     """
     try:
         response = model.generate_content(prompt)
