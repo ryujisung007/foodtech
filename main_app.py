@@ -2,11 +2,11 @@ import streamlit as st
 import engine_data
 import ui_layout
 
-# 페이지 설정
+# 페이지 설정: 와이드 모드로 테이블 가독성 확보
 st.set_page_config(
     page_title="푸드테크 기업 정보 시뮬레이터",
     page_icon="🍲",
-    layout="wide" # 테이블을 넓게 보기 위해 와이드 모드 유지
+    layout="wide"
 )
 
 def main():
@@ -23,11 +23,11 @@ def main():
     if not df.empty:
         if mid_cat != "선택하세요" and sub_cat != "선택하세요":
             filtered_df = engine_data.get_filtered_results(df, mid_cat, sub_cat)
-            ui_layout.render_results(filtered_df) # 수정된 테이블 렌더링 함수 호출
+            ui_layout.render_results(filtered_df)
         else:
             st.info("💡 왼쪽 사이드바에서 **중분류**와 **소분류**를 선택해 주세요.")
     else:
-        st.error("데이터 파일(foodtech_company.csv)이 없습니다. 사이드바에서 파일을 업로드해 주세요.")
+        st.error("데이터를 불러올 수 없습니다. CSV 파일이 없거나 업로드되지 않았습니다.")
 
 if __name__ == "__main__":
     main()
