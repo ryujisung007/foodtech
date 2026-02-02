@@ -3,22 +3,40 @@ import engine_data
 import ui_layout
 
 def main():
-    st.set_page_config(layout="wide", page_title="Food Tech R&D")
-    st.title("🚀 식품 R&D 제품 개발 시뮬레이터")
+    st.set_page_config(layout="wide", page_title="Food Tech R&D Simulator")
+    st.title("🧪 식품 소재 및 제품 개발 시뮬레이터")
 
+    # 데이터 로드
     df = engine_data.load_data()
 
     if df is not None:
-        # KeyError 방지: '기업이름' 컬럼 존재 여부 확인
-        if '기업이름' in df.columns:
-            # 사이드바에서 기업 선택
-            company_list = sorted(df['기업이름'].unique())
-            selected = st.sidebar.selectbox("대상 기업 선택", company_list)
+        # 사이드바 필터링 (중분류, 소분류 기능 복구)
+        st.sidebar.header("🔍 검색 필터")
+        
+        # 중분류 선택
+        m_categories = ["전체"] + list(df['중분류'].unique())
+        selected_m = st.sidebar.selectbox("중분류 선택", m_categories)
+        
+        filtered_df = df.copy()
+        if selected_m != "전체":
+            filtered_df = filtered_df[filtered_df['중분류'] == selected_m]
             
-            target_df = df[df['기업이름'] == selected]
-            ui_layout.render_results(target_df)
-        else:
-            st.error(f"컬럼명 오류. '기업이름' 컬럼이 필요합니다. 현재 컬럼: {list(df.columns)}")
+        # 소분류 선택
+        s_categories = ["전체"] + list(filtered_df['소분류'].unique())
+        selected_s = st.sidebar.selectbox("소분류 선택", s_categories)
+        
+        if selected_s != "전체":
+            filtered_df = filtered_df[filtered_df['소분류'] == selected_s]
+            
+        # 기업이름 선택
+        companies = ["전체"] + list(filtered_df['기업이름'].unique())
+        selected_c = st.sidebar.selectbox("기업 선택", companies)
+        
+        if selected_c != "전체":
+            filtered_df = filtered_df[filtered_df['기업이름'] == selected_c]
+
+        # 결과 렌더링 호출 (TypeError 방지: 인자 1개 전달)
+        ui_layout.render_results(filtered_df)
 
 if __name__ == "__main__":
     main()
