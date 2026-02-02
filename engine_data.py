@@ -8,7 +8,10 @@ def load_data():
         return st.session_state['uploaded_df']
     file_path = 'foodtech_company.csv'
     if os.path.exists(file_path):
-        df = pd.read_csv(file_path).fillna('-')
+        try:
+            df = pd.read_csv(file_path, encoding='utf-8-sig').fillna('-')
+        except:
+            df = pd.read_csv(file_path, encoding='cp949').fillna('-')
         return df
     return pd.DataFrame()
 
