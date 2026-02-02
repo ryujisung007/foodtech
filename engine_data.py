@@ -1,15 +1,20 @@
 import pandas as pd
 import streamlit as st
+import os
 
 def load_data():
-    """데이터 로드 및 텍스트 정제"""
-    file_path = "foodtech_company.csv"
+    """DB 파일을 로드하고 컬럼명 및 데이터를 정제합니다."""
+    file_name = 'foodtech_company.csv'
+    if not os.path.exists(file_name):
+        st.error(f"파일을 찾을 수 없습니다: {file_name}")
+        return None
     try:
-        df = pd.read_csv(file_path, encoding='utf-8-sig')
+        # 한글 인코딩 및 컬럼명 공백 제거
+        df = pd.read_csv(file_name, encoding='utf-8-sig')
         df.columns = [col.strip() for col in df.columns]
-        # 데이터 내의 줄바꿈을 공백으로 치환하여 로직 오류 방지
+        # 데이터 내 줄바꿈 제거하여 프롬프트 가독성 향상
         df = df.replace(r'\n', ' ', regex=True)
         return df
     except Exception as e:
-        st.error(f"데이터 로드 실패: {e}")
+        st.error(f"데이터 로드 중 오류 발생: {e}")
         return None
