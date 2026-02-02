@@ -17,7 +17,8 @@ def get_product_ideation(company_name, tech_info):
         
         [기업명]: {company_name}
         [보유기술]: {tech_info}
-        
+        [보유소재]: {product_info}
+         
         형식:
         ### [카테고리명]
         - **제품명**: ...
