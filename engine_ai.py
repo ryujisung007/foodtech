@@ -1,39 +1,41 @@
 import google.generativeai as genai
+import streamlit as st
 import random
-# (생략: 필요한 라이브러리 임포트)
 
-def generate_innovative_image(analysis_result):
-    """
-    제미나이 분석 결과를 바탕으로 다양성이 확보된 이미지를 생성하는 로직
-    """
-    # 1. 프롬프트에 다양성을 주기 위한 수식어 배열
-    styles = ["modern and sleek", "industrial high-tech", "laboratory setting", "futuristic concept"]
-    lighting = ["natural sunlight", "cinematic lighting", "soft studio light", "vibrant neon glow"]
+# API 키 설정 (Streamlit Secrets 활용)
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+
+def get_product_ideation(company, tech, product):
+    """제미나이를 이용해 제품 및 기술 제안 텍스트 생성"""
+    model = genai.GenerativeModel('gemini-1.5-flash') # 속도와 효율 중심
+    prompt = f"{company}의 {tech} 기술과 {product} 제품을 분석하여, 이를 활용한 식품 R&D 신제품 아이디어와 기술 적용 방안을 설명해줘."
     
-    selected_style = random.choice(styles)
-    selected_light = random.choice(lighting)
-    
-    # 2. 제미나이 분석 결과(제품, 기술)를 조합하여 상세 프롬프트 생성
-    # analysis_result는 {'tech': '...', 'product': '...'} 형태라고 가정
-    refined_prompt = (
-        f"A high-quality image of {analysis_result['product']} "
-        f"incorporating {analysis_result['tech']} technology. "
-        f"The scene is {selected_style} with {selected_light}. "
-        f"Professional photography, 8k resolution, detailed texture."
-    )
-    
-    # 3. Imagen 모델 호출 (API 구조에 맞춰 설정)
-    # 여기서 시드값을 랜덤으로 주어 동일 프롬프트에서도 변화를 줌
     try:
-        model = genai.GenerativeModel('imagen-3.0-generate-001') # 최신 모델명 확인 필요
-        response = model.generate_content(
-            refined_prompt,
-            # seed=random.randint(1, 1000000) # 필요시 설정
-        )
-        return response.images[0]
+        response = model.generate_content(prompt)
+        return response.text
     except Exception as e:
-        print(f"이미지 생성 오류: {e}")
-        return None
+        return f"텍스트 생성 중 오류 발생: {e}"
 
-# 전체 흐름에서 이 함수를 호출할 때, 
-# 이전에 생성된 이미지를 삭제하거나 화면을 리프레시하는 로직이 ui_layout.py에 포함되어야 합니다.
+def generate_nano_banana_images(tech, product, count=3):
+    """나노 바나나(Imagen)를 사용하여 3개의 서로 다른 추천 이미지를 생성"""
+    # Imagen 모델 설정 (모델명은 실제 사용 가능한 최신 버전 기준)
+    # 실제 Imagen API 호출 구조는 라이브러리 버전에 따라 다를 수 있으므로 표준 구조로 작성함
+    images = []
+    
+    # 이미지별 다양성을 위한 스타일 셋
+    styles = ["Hyper-realistic photography", "Futuristic 3D render", "Minimalist professional studio shot"]
+    
+    for i in range(count):
+        style = styles[i % len(styles)]
+        # 동일한 그림을 방지하기 위해 스타일과 랜덤 요소를 섞은 상세 프롬프트 생성
+        prompt = (
+            f"{style} of a new food product concept using {tech} and {product}. "
+            f"High resolution, 8k, professional food styling, creative lighting, "
+            f"variation_{random.randint(1, 1000)}"
+        )
+        
+        try:
+            # 나노 바나나(Imagen) 호출 로직
+            model = genai.GenerativeModel('imagen-3.0-generate-001') 
+            response = model.generate_content(prompt)
+            # 성공 시 이미지 리
