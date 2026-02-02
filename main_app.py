@@ -18,7 +18,7 @@ def main():
         else:
             st.info("왼쪽 사이드바에서 분류를 선택해 주세요.")
     else:
-        st.error("데이터가 없습니다. CSV 파일을 업로드해 주세요.")
+        st.error("데이터 파일이 없습니다. 사이드바에 CSV 파일을 업로드해 주세요.")
 
 if __name__ == "__main__":
     main()
