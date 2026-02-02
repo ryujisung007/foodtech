@@ -28,7 +28,6 @@ def get_product_ideation(company_name, tech_info, product_info):
     당신은 식품공학 박사이자 식품기술사입니다.
     [{company_name}]의 기술({tech_info})과 소재({product_info})를 분석하여 
     아이스크림, 초콜릿, 초콜릿 코팅, 베이커리 4개 분야의 혁신 제품을 제안하세요.
-    - 특히 '메타텍스쳐(ALOK 등)' 기술의 겔화 및 응고 특징을 기술하십시오.
     - 전문 용어를 사용하여 상세히 설명하세요.
     """
     try:
