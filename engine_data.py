@@ -9,9 +9,7 @@ def load_data():
     file_path = 'foodtech_company.csv'
     if os.path.exists(file_path):
         try:
-            # 다양한 인코딩 대응
-            df = pd.read_csv(file_path, encoding='utf-8-sig').fillna('-')
-            return df
+            return pd.read_csv(file_path, encoding='utf-8-sig').fillna('-')
         except:
             return pd.read_csv(file_path, encoding='cp949').fillna('-')
     return pd.DataFrame()
