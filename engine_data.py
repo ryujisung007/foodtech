@@ -18,10 +18,8 @@ def get_unique_categories(df, col, filters=None):
     if df.empty: return []
     tmp = df.copy()
     if filters:
-        for c, v in filters.items():
-            tmp = tmp[tmp[c] == v]
+        for c, v in filters.items(): tmp = tmp[tmp[c] == v]
     return sorted(tmp[col].unique().tolist())
 
 def get_filtered_results(df, mid, sub):
-    if df.empty: return df
     return df[(df['중분류'] == mid) & (df['소분류'] == sub)]
