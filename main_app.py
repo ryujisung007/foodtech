@@ -1,34 +1,23 @@
 import streamlit as st
+import pandas as pd
 import engine_data
 import ui_layout
 
-# 페이지 설정
-st.set_page_config(
-    page_title="푸드테크 AI 플랫폼",
-    page_icon="🍲",
-    layout="wide"
-)
-
 def main():
-    st.title("🚀 푸드테크 기업 정보 & AI R&D 플랫폼")
+    st.set_page_config(layout="wide", page_title="식품 R&D 시뮬레이터")
     
-    # 1. 데이터 로드
+    st.title("🚀 식품 기술 및 제품 분석 대시보드")
+    
+    # 데이터 로드 (engine_data 모듈 사용)
     df = engine_data.load_data()
     
-    # 2. 사이드바 렌더링 (중분류 -> 소분류 필터)
-    mid_cat, sub_cat = ui_layout.render_sidebar(df, engine_data)
-    
-    # 3. 메인 결과 출력 및 챗봇 실행
-    if not df.empty:
-        if mid_cat != "선택하세요" and sub_cat != "선택하세요":
-            filtered_df = engine_data.get_filtered_results(df, mid_cat, sub_cat)
-            # 필터링된 데이터와 전체 데이터를 함께 전달
-            ui_layout.render_results(filtered_df, df) 
-        else:
-            st.info("💡 왼쪽 사이드바에서 분류를 선택하세요. 하단 챗봇은 상시 이용 가능합니다.")
-            ui_layout.render_chatbot(df)
-    else:
-        st.error("데이터 파일이 없습니다. CSV 파일을 업로드해 주세요.")
+    if df is not None:
+        # 사이드바에서 회사 선택
+        selected_company = st.sidebar.selectbox("분석할 회사를 선택하세요", df['회사명'].unique())
+        filtered_df = df[df['회사명'] == selected_company]
+        
+        # UI 레이아웃 호출
+        ui_layout.render_results(filtered_df, df)
 
 if __name__ == "__main__":
     main()
