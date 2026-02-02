@@ -11,16 +11,16 @@ def main():
     if df is not None:
         st.sidebar.header("🔍 검색 및 필터")
         
-        # 필터링 체인 (중분류 -> 소분류 -> 기업이름)
+        # 필터링 체인
         m_list = ["전체"] + sorted(list(df['중분류'].unique()))
-        selected_m = st.sidebar.selectbox("중분류 선택", m_list)
+        selected_m = st.sidebar.selectbox("중분류", m_list)
         
         curr_df = df.copy()
         if selected_m != "전체":
             curr_df = curr_df[curr_df['중분류'] == selected_m]
             
         s_list = ["전체"] + sorted(list(curr_df['소분류'].unique()))
-        selected_s = st.sidebar.selectbox("소분류 선택", s_list)
+        selected_s = st.sidebar.selectbox("소분류", s_list)
         
         if selected_s != "전체":
             curr_df = curr_df[curr_df['소분류'] == selected_s]
@@ -31,7 +31,7 @@ def main():
         if selected_c != "전체":
             curr_df = curr_df[curr_df['기업이름'] == selected_c]
 
-        # 결과 레이아웃 호출
+        # UI 레이아웃 호출
         ui_layout.render_results(curr_df)
 
 if __name__ == "__main__":
