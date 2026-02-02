@@ -2,27 +2,25 @@ import streamlit as st
 import engine_data
 import ui_layout
 
-st.set_page_config(
-    page_title="푸드테크 AI 시뮬레이터",
-    page_icon="🍲",
-    layout="wide"
-)
+st.set_page_config(page_title="푸드테크 AI 플랫폼", layout="wide")
 
 def main():
-    st.title("🚀 푸드테크 기업 정보 & AI 제품 아이디에이션")
-    st.markdown("식품공학 전문가를 위한 기술 및 소재 기반 신제품 창작 플랫폼입니다.")
-
+    st.title("🚀 푸드테크 기업 정보 & AI R&D 플랫폼")
+    
     df = engine_data.load_data()
     mid_cat, sub_cat = ui_layout.render_sidebar(df, engine_data)
     
     if not df.empty:
         if mid_cat != "선택하세요" and sub_cat != "선택하세요":
             filtered_df = engine_data.get_filtered_results(df, mid_cat, sub_cat)
-            ui_layout.render_results(filtered_df)
+            # 챗봇을 위해 전체 df와 필터링된 df를 함께 전달
+            ui_layout.render_results(filtered_df, df) 
         else:
-            st.info("💡 왼쪽 사이드바에서 분류를 선택하세요.")
+            st.info("왼쪽에서 분류를 선택하세요. (하단에서 챗봇을 이용하실 수 있습니다.)")
+            # 선택 전에도 챗봇 사용 가능하게 하려면 여기에 render_chatbot 추가
+            ui_layout.render_chatbot(df)
     else:
-        st.error("데이터가 로드되지 않았습니다.")
+        st.error("데이터 파일이 없습니다.")
 
 if __name__ == "__main__":
     main()
