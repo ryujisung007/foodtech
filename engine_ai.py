@@ -1,7 +1,7 @@
 import openai
 import streamlit as st
 
-def get_product_ideation(company_name, tech_info):
+def get_product_ideation(company_name, tech_info, product_info):
     """기업 기술 기반 4대 카테고리 제품 아이디에이션 생성"""
     
     # Secrets 키 존재 여부 확인 (KeyError 방지)
